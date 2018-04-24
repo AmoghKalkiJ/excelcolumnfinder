@@ -11,8 +11,8 @@ import (
 )
 
 var (
-	path, _     = os.Getwd()
-	search_page = path + "/../assets/search.html"
+	path        = os.Getenv("GOPATH")
+	search_page = path + "/src/excelcolumnfinder/assets/search.html"
 )
 
 //table which looks like an excel sheet
@@ -34,8 +34,8 @@ type Values struct {
 // web portal
 func Portal(w http.ResponseWriter, r *http.Request) {
 
-	login_tpl := template.Must(template.ParseFiles(search_page))
-	login_tpl.Execute(w, struct{ Success bool }{true})
+	input_tpl := template.Must(template.ParseFiles(search_page))
+	input_tpl.Execute(w, struct{ Success bool }{true})
 
 }
 
