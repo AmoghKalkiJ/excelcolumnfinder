@@ -1,0 +1,147 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="msapplication-tap-highlight" content="no">
+    <meta name="viewport" content="initial-scale=1 ,width=device-width">
+    <style>
+        .input-box {
+            position: relative;
+            width: 90%;
+            height: 6vh;
+            font-size: 1em;
+            padding: 0 2vw;
+            margin: 0 2vw;
+        }
+
+        .input-cont {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .submit-btn {
+            position: relative;
+            margin-left: 6vw;
+            height: 6vh;
+            width: 22vw;
+        }
+
+        .result-div {
+            position: relative;
+            margin : 2vw;
+        }
+
+        table {
+            position: relative;
+            width: 60%;
+        }
+
+        td {
+            position: relative;
+            border: 1px solid lightgrey;
+            width: 33%;
+
+
+            text-align: center;
+            padding: 4vw;
+        }
+
+    </style>
+<body onload="onContentLoaded()">
+<div class="input-cont">
+    <input class="input-box col-start" type="number" placeholder="Column to start">
+    <input class="input-box no-rows" type="number" placeholder="No of rows">
+    <input class="input-box no-cols" type="number" placeholder="No of columns">
+
+    <button class="submit-btn" onclick="onSubmit()">
+        Submit
+    </button>
+</div>
+<div class="result-div">
+</div>
+<div id="resultTable" class= "result-div1" style="margin-left: 42px;">
+</div>
+<p id="error"></p>
+</body>
+<script>
+
+    function onContentLoaded() {
+        var array = []
+        var resultarray = []
+        arr = [["AZ","BA","BB"], ["BC","BD","BE"] , ["BF","BG","BH"]]
+        createTable()
+    }
+
+    function onSubmit() {
+        console.log('coming here')
+        const   startCol      = document.getElementsByClassName('col-start')[0].value,
+                numRows       = document.getElementsByClassName('no-rows')[0].value,
+                numCols       = document.getElementsByClassName('no-cols')[0].value,
+                http          = new XMLHttpRequest();
+        url           = "/api/columnfinder"
+
+        var obj = new Object();
+        var response
+        obj.StartColumn = startCol;
+        obj.NumRows = numRows;
+        obj.NumCols = numCols;
+        obj.Inputarray = arr;
+        http.open("POST", url, true);
+
+        http.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+
+        http.onreadystatechange = function() {
+            if(http.readyState == 4 ){
+                if(http.status == 200) {
+                response = JSON.parse(http.responseText)
+                resultarray = response.Extra
+                console.log('after parse response', response)
+                resultTable()
+                document.getElementById("error").innerHTML = ""
+            }else {
+                response = JSON.parse(http.responseText)
+                document.getElementById("resultTable").innerHTML = ""
+                document.getElementById("error").innerHTML =  response.Extra
+             }
+        }
+        }
+        
+        http.send(JSON.stringify(obj));
+    }
+
+    function createTable() {
+        let mytable = "<table cellpadding=\"0\" cellspacing=\"0\ style=\"background: antiquewhite\"><tbody><tr>";
+
+        for (let i = 0; i < arr.length; i++) {
+            for (let j = 0 ; j < arr[i].length; j++) {
+                mytable += "<td>" + arr[i][j] + "</td>";
+            }
+            mytable += "</tr><tr>";
+        }
+
+        mytable += "</tr></tbody></table>";
+
+        const resultElem = document.getElementsByClassName('result-div')[0]
+        resultElem.innerHTML  = mytable
+    }
+
+    function resultTable() {
+        let mytable = "<table cellpadding=\"0\" cellspacing=\"0\ style=\"background: antiquewhite\"><tbody><tr>";
+
+        for (let i = 0; i < resultarray.length; i++) {
+            for (let j = 0 ; j < resultarray[i].length; j++) {
+                mytable += "<td>" + resultarray[i][j] + "</td>";
+            }
+            mytable += "</tr><tr>";
+        }
+
+        mytable += "</tr></tbody></table>";
+
+        const resultElem = document.getElementsByClassName('result-div1')[0]
+        resultElem.innerHTML  = mytable
+    }
+
+</script>
+</head>
+</html>
